@@ -16,6 +16,9 @@ qt_add_executable(practica_5 MACOSX_BUNDLE
     fusion.h
     simulacion.h simulacion.cpp
     lectorsimulacion.h lectorsimulacion.cpp
+    caja.cpp
+    fusion.cpp
+    obstaculo.cpp
 )
 
 target_link_libraries(practica_5

@@ -5,7 +5,7 @@
 #include <string>
 #include "Particula.h"
 #include "Caja.h"
-#include "Obstaculo.h"
+#include "obstaculo.h"
 #include "Fusion.h"
 
 class Simulacion {
@@ -16,14 +16,14 @@ private:
     std::string nombreArchivo;
 
     Caja caja;
-    std::vector<Obstaculo> obstaculos;
+    std::vector<obstaculo> obstaculos;
     std::vector<Particula> particulas;
 
 public:
     Simulacion(double dt, double tiempoTotal, double e, const std::string& nombreArchivo);
 
     void setCaja(const Caja& c);
-    void agregarObstaculo(const Obstaculo& obs);
+    void agregarObstaculo(const obstaculo& obs);
     void agregarParticula(const Particula& p);
 
     void ejecutar();

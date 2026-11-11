@@ -7,7 +7,7 @@ Simulacion::Simulacion(double dt, double tiempoTotal, double e, const std::strin
     : dt(dt), tiempoTotal(tiempoTotal), e(e), nombreArchivo(nombreArchivo) {}
 
 void Simulacion::setCaja(const Caja& c) { caja = c; }
-void Simulacion::agregarObstaculo(const Obstaculo& obs) { obstaculos.push_back(obs); }
+void Simulacion::agregarObstaculo(const obstaculo& obs) { obstaculos.push_back(obs); }
 void Simulacion::agregarParticula(const Particula& p) { particulas.push_back(p); }
 
 void Simulacion::ejecutar() {
@@ -43,7 +43,7 @@ void Simulacion::ejecutar() {
         for (auto& p : particulas) {
             if (p.isActiva()) {
                 for (const auto& obs : obstaculos) {
-                    if (const_cast<Obstaculo&>(obs).colisiona(p, e)) {
+                    if (const_cast<obstaculo&>(obs).colisiona(p, e)) {
                         archivo << "COL,OBST," << t << "," << p.getId() << "," << obs.id << "," << p.getX() << "," << p.getY() << "\n";
                     }
                 }

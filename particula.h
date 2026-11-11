@@ -31,6 +31,8 @@ public:
     void setVx(double nvx) { vx = nvx; }
     void setVy(double nvy) { vy = nvy; }
     void setActiva(bool estado) { activa = estado; }
+    void setMasa(double nm) { masa = nm; }
+    void setRadio(double nr) { radio = nr; }
 };
 
 #endif
