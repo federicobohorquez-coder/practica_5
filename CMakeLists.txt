@@ -5,13 +5,17 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
 
 qt_standard_project_setup()
 
-qt_add_executable(practica_5
-    WIN32 MACOSX_BUNDLE
+qt_add_executable(practica_5 MACOSX_BUNDLE
     main.cpp
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
     particula.h particula.cpp
+    caja.h
+    obstaculo.h
+    fusion.h
+    simulacion.h simulacion.cpp
+    lectorsimulacion.h lectorsimulacion.cpp
 )
 
 target_link_libraries(practica_5
