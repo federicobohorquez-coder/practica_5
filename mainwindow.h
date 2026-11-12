@@ -5,6 +5,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QTimer>
+#include <QResizeEvent>
 #include <vector>
 #include <unordered_map>
 #include "LectorSimulacion.h"
@@ -25,6 +26,9 @@ private:
 
     void cargarYDibujarEstaticos();
     void inicializarParticulas();
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
 
 private slots:
     void avanzarFrame();
