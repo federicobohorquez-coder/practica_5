@@ -8,7 +8,7 @@
 
 struct PosicionParticula {
     int id;
-    double x, y;
+    double x, y, radio;
 };
 
 struct FrameSimulacion {

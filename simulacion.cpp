@@ -68,7 +68,7 @@ void Simulacion::ejecutar() {
         // 5. Registro POS
         for (const auto& p : particulas) {
             if (p.isActiva()) {
-                archivo << "POS," << t << "," << p.getId() << "," << p.getX() << "," << p.getY() << "\n";
+            archivo << "POS," << t << "," << p.getId() << "," << p.getX() << "," << p.getY() << "," << p.getRadio() << "\n";
             }
         }
     }
