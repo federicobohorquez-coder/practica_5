@@ -37,10 +37,10 @@ bool LectorSimulacion::cargarArchivo(const std::string& ruta) {
             obstaculos.emplace_back(id, x, y, lado);
         }
         else if (tipo == "POS") {
-            double t, x, y;
+            double t, x, y, r = 3.0;
             int id;
             char c;
-            ss >> t >> c >> id >> c >> x >> c >> y;
+            ss >> t >> c >> id >> c >> x >> c >> y >> c >> r;
 
             if (frameActual.tiempo != t) {
                 if (frameActual.tiempo >= 0.0) {
@@ -49,7 +49,7 @@ bool LectorSimulacion::cargarArchivo(const std::string& ruta) {
                 frameActual.tiempo = t;
                 frameActual.posiciones.clear();
             }
-            frameActual.posiciones.push_back({id, x, y});
+            frameActual.posiciones.push_back({id, x, y, r});
         }
     }
 

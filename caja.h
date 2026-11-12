@@ -10,18 +10,8 @@ public:
     Caja(double xmin = 0, double xmax = 100, double ymin = 0, double ymax = 60)
         : xmin(xmin), xmax(xmax), ymin(ymin), ymax(ymax) {}
 
-    bool rebotar(Particula& p) {
-        bool reboto = false;
-        if (p.getX() - p.getRadio() <= xmin || p.getX() + p.getRadio() >= xmax) {
-            p.setVx(-p.getVx());
-            reboto = true;
-        }
-        if (p.getY() - p.getRadio() <= ymin || p.getY() + p.getRadio() >= ymax) {
-            p.setVy(-p.getVy());
-            reboto = true;
-        }
-        return reboto;
-    }
+    // Devuelve true si hubo rebote en alguna pared (la Simulacion lo registra).
+    bool rebotar(Particula& p) const;
 };
 
 #endif

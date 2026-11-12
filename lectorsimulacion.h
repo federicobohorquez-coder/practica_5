@@ -8,7 +8,7 @@
 
 struct PosicionParticula {
     int id;
-    double x, y;
+    double x, y, radio;
 };
 
 struct FrameSimulacion {
@@ -19,7 +19,7 @@ struct FrameSimulacion {
 class LectorSimulacion {
 private:
     Caja caja;
-    std::vector<Obstaculo> obstaculos;
+    std::vector<obstaculo> obstaculos;
     std::vector<FrameSimulacion> frames;
 
 public:
@@ -28,7 +28,7 @@ public:
     bool cargarArchivo(const std::string& ruta);
 
     const Caja& getCaja() const { return caja; }
-    const std::vector<Obstaculo>& getObstaculos() const { return obstaculos; }
+    const std::vector<obstaculo>& getObstaculos() const { return obstaculos; }
     const std::vector<FrameSimulacion>& getFrames() const { return frames; }
 };
 

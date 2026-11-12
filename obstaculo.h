@@ -3,18 +3,16 @@
 
 #include "Particula.h"
 
-class Obstaculo {
+class obstaculo {
 public:
     int id;
     double x, y, lado;
 
-    Obstaculo(int id, double x, double y, double lado)
+    obstaculo(int id, double x, double y, double lado)
         : id(id), x(x), y(y), lado(lado) {}
 
-    bool colisiona(Particula& p, double e) {
-        (void)p; (void)e;
-        return false; // Persona A implementará la lógica real
-    }
+    // Devuelve true si hubo colision (la Simulacion la registra como OBST).
+    bool colisiona(Particula& p, double e) const;
 };
 
 #endif
