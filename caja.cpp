@@ -1,14 +1,15 @@
 #include "Caja.h"
 bool Caja::rebotar(Particula& p) const {
     bool reboto = false;
-    const double r = p.getRadio();
+    const double r = p.getRadio(); // Guarda el radio
 
     // Pared izquierda
-    if (p.getX() - r < xmin) {
+    if (p.getX() - r < xmin) {          // Detecta contacto con la pared izquierda
         p.setX(xmin + r);               // reubicar justo en el borde
         if (p.getVx() < 0) {            // solo hay rebote si se estaba acercando
             p.setVx(-p.getVx());        // v'_perp = -v_perp (elastico)
-            reboto = true;
+            reboto = true;              // informa a la Simulacion si hubo algún rebote en este paso.
+
         }
     }
     // Pared derecha

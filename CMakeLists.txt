@@ -19,6 +19,10 @@ qt_add_executable(practica_5 MACOSX_BUNDLE
     caja.cpp
     fusion.cpp
     obstaculo.cpp
+    Config.h
+    Jugador.h
+    bloque.h bloque.cpp
+    proyectil.h proyectil.cpp
 )
 
 target_link_libraries(practica_5

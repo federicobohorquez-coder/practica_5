@@ -6,7 +6,7 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
     // 1. Configurar la simulación: dt = 0.01s, tiempoTotal = 10s, restitución e = 0.8
-    Simulacion sim(0.01, 10.0, 0.8, "simulacion_salida.txt");
+    Simulacion sim(0.01, 30.0, 0.4, "simulacion_salida.txt");
 
     // 2. Definir la caja (ancho: 200, alto: 150)
     sim.setCaja(Caja(0.0, 200.0, 0.0, 150.0));
