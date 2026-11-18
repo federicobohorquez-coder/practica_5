@@ -23,6 +23,8 @@ qt_add_executable(practica_5 MACOSX_BUNDLE
     Jugador.h
     bloque.h bloque.cpp
     proyectil.h proyectil.cpp
+    representante.h representante.cpp
+    juego.h juego.cpp
 )
 
 target_link_libraries(practica_5
