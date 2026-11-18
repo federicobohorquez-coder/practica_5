@@ -1,12 +1,13 @@
 #include <QApplication>
 #include "MainWindow.h"
 #include "Simulacion.h"
+#include "ventanajuego.h"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
     // 1. Configurar la simulación: dt = 0.01s, tiempoTotal = 10s, restitución e = 0.8
-    Simulacion sim(0.01, 10.0, 0.8, "simulacion_salida.txt");
+ /*   Simulacion sim(0.01, 10.0, 0.8, "simulacion_salida.txt");
 
     // 2. Definir la caja (ancho: 200, alto: 150)
     sim.setCaja(Caja(0.0, 200.0, 0.0, 150.0));
@@ -29,10 +30,11 @@ int main(int argc, char *argv[]) {
     // 5. Ejecutar motor físico y generar "simulacion_salida.txt"
     sim.ejecutar();
 
-    // 6. Abrir interfaz gráfica y reproducir la simulación
-    MainWindow window;
-    window.setWindowTitle("Simulador de Colisiones Múltiples - Práctica 5");
+   */ // 6. Abrir interfaz gráfica y reproducir la simulación
+    VentanaJuego window;
+    window.setWindowTitle("Práctica 5 - Juego");
     window.show();
+    return app.exec();
 
     return app.exec();
 }
