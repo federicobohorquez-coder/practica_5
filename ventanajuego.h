@@ -19,6 +19,9 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGraphicsSimpleTextItem>
+#include <QSoundEffect>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 #include "proyectil.h"
 #include "caja.h"
 #include "bloque.h"
@@ -89,6 +92,9 @@ private:
     void mostrarVictoria(int jugador);
     void reiniciarPartida();
     bool tocaRival(int jugadorRival) const;    // TEMPORAL
+    QSoundEffect *sonidoDisparo;     // efecto corto, suena al instante
+    QMediaPlayer *musicaAmbiente;    // música larga en bucle
+    QAudioOutput *salidaAudio;       // por dónde sale el audio del QMediaPlayer (Qt 6)
 };
 
 #endif
