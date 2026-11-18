@@ -1,17 +1,14 @@
 #include "ventanajuego.h"
 #include "Config.h"
-#include <QTimer>
 #include <QPen>
 #include <QBrush>
-#include <QGraphicsSimpleTextItem>
-#include <QGraphicsEllipseItem>
 #include <QFont>
-#include <QPainterPath>
+#include <QPixmap>
+#include <QGraphicsPixmapItem>
 #include <cmath>
 #include <algorithm>
-#include <QGraphicsPixmapItem>
-#include <QPixmap>
 
+// ======================== CONSTRUCTOR ========================
 VentanaJuego::VentanaJuego(QWidget *parent) : QMainWindow(parent) {
     scene = new QGraphicsScene(this);
 
@@ -30,14 +27,16 @@ VentanaJuego::VentanaJuego(QWidget *parent) : QMainWindow(parent) {
     lblAngulo = new QLabel(central);
     lblAngulo->setMinimumWidth(90);
     sliderAngulo = new QSlider(Qt::Horizontal, central);
-    sliderAngulo->setRange(static_cast<int>(Config::ANGULO_MIN), static_cast<int>(Config::ANGULO_MAX));
+    sliderAngulo->setRange(static_cast<int>(Config::ANGULO_MIN),
+                           static_cast<int>(Config::ANGULO_MAX));
     sliderAngulo->setValue(45);
     sliderAngulo->setFocusPolicy(Qt::NoFocus);
 
     lblVelocidad = new QLabel(central);
     lblVelocidad->setMinimumWidth(110);
     sliderVelocidad = new QSlider(Qt::Horizontal, central);
-    sliderVelocidad->setRange(static_cast<int>(Config::VEL_MIN), static_cast<int>(Config::VEL_MAX));
+    sliderVelocidad->setRange(static_cast<int>(Config::VEL_MIN),
+                              static_cast<int>(Config::VEL_MAX));
     sliderVelocidad->setValue(150);
     sliderVelocidad->setFocusPolicy(Qt::NoFocus);
 
@@ -59,17 +58,18 @@ VentanaJuego::VentanaJuego(QWidget *parent) : QMainWindow(parent) {
     resize(1000, 600);
 
     // ---------- Escena ----------
-    crearEscenario();
-    dibujarEscena();
+    dibujarEscena();   // el escenario ya lo creó el constructor de Juego
 
     const double r = Config::RADIO_PROYECTIL;
-    itemProyectil = scene->addEllipse(-r, -r, 2 * r, 2 * r, QPen(Qt::black, 1), QBrush(Qt::darkGray));
+    itemProyectil = scene->addEllipse(-r, -r, 2 * r, 2 * r,
+                                      QPen(Qt::black, 1), QBrush(Qt::darkGray));
     itemProyectil->setZValue(5);
     itemProyectil->setVisible(false);
     trayectoria = scene->addPath(QPainterPath(), QPen(Qt::darkBlue, 1, Qt::DashLine));
 
     // Banner de victoria (oculto hasta que alguien gane)
-    bannerVictoria = scene->addRect(0, 0, Config::ANCHO_CAJA, 110, Qt::NoPen, QBrush(QColor(0, 0, 0, 160)));
+    bannerVictoria = scene->addRect(0, 0, Config::ANCHO_CAJA, 110,
+                                    Qt::NoPen, QBrush(QColor(0, 0, 0, 160)));
     bannerVictoria->setPos(0, 110);
     bannerVictoria->setZValue(20);            // encima de todo
     bannerVictoria->setVisible(false);
@@ -82,7 +82,8 @@ VentanaJuego::VentanaJuego(QWidget *parent) : QMainWindow(parent) {
 
     QFont fuenteChica;
     fuenteChica.setPixelSize(16);
-    textoReiniciar = new QGraphicsSimpleTextItem("Presiona R para jugar de nuevo", bannerVictoria);
+    textoReiniciar = new QGraphicsSimpleTextItem("Presiona R para jugar de nuevo",
+                                                 bannerVictoria);
     textoReiniciar->setFont(fuenteChica);
     textoReiniciar->setBrush(Qt::white);
 
@@ -100,9 +101,6 @@ VentanaJuego::VentanaJuego(QWidget *parent) : QMainWindow(parent) {
     actualizarCanion();
     actualizarPanel();
 
-    QTimer::singleShot(0, this, [this]() {
-        view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
-    });
     // ---------- Sonido ----------
     sonidoDisparo = new QSoundEffect(this);
     sonidoDisparo->setSource(QUrl("qrc:/assets/disparo.wav"));
@@ -115,33 +113,20 @@ VentanaJuego::VentanaJuego(QWidget *parent) : QMainWindow(parent) {
     musicaAmbiente->setSource(QUrl("qrc:/assets/ambiente.mp3"));
     musicaAmbiente->setLoops(QMediaPlayer::Infinite);   // se repite sin parar
     musicaAmbiente->play();
-}
-void VentanaJuego::crearEscenario() {
-    const double W = Config::ANCHO_CAJA;   // 800
-    const double H = Config::ALTO_CAJA;    // 400
-    caja = Caja(0.0, W, 0.0, H);
 
-    // Fortalezas como la figura 2: superior (100) y dos laterales (200)
-    const double xFort[2] = {70.0, W - 70.0 - 140.0};
-    for (int p = 0; p < 2; ++p) {
-        const double x0 = xFort[p];
-        const int base = p * 10;   // ids: jugador 0 -> 0,1,2 ; jugador 1 -> 10,11,12
-        bloques.emplace_back(base + 0, p, x0,         H - 100, 140, 20, Config::RESISTENCIA_SUPERIOR);
-        bloques.emplace_back(base + 1, p, x0,         H - 80,  20,  80, Config::RESISTENCIA_LATERAL);
-        bloques.emplace_back(base + 2, p, x0 + 120.0, H - 80,  20,  80, Config::RESISTENCIA_LATERAL);
-    }
-
-    // Cañones afuera de cada fortaleza, sobre el suelo
-    const double yCanion = H - Config::RADIO_PROYECTIL;
-    jugadores.emplace_back(0, "Jugador 1", xFort[0] + 140 + 40, yCanion,  1);  // dispara a la derecha
-    jugadores.emplace_back(1, "Jugador 2", xFort[1] - 40,       yCanion, -1);  // dispara a la izquierda
+    QTimer::singleShot(0, this, [this]() {
+        view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    });
 }
 
+// ======================== DIBUJO INICIAL ========================
 void VentanaJuego::dibujarEscena() {
+    const Caja &caja = juego.getCaja();
     const double W = caja.xmax - caja.xmin;
     const double H = caja.ymax - caja.ymin;
+
     const double ALTO_SUELO = 30.0;
-    scene->setSceneRect(caja.xmin, caja.ymin, W, H + ALTO_SUELO);   // incluye la franja de suelo
+    scene->setSceneRect(caja.xmin, caja.ymin, W, H + ALTO_SUELO);   // incluye el suelo
 
     // Fondo: imagen de 1600x800 px escalada a 800x400 unidades
     QPixmap fondo(":/assets/fondo.png");
@@ -151,7 +136,8 @@ void VentanaJuego::dibujarEscena() {
     itemFondo->setZValue(-10);                                     // detrás de todo
 
     // Suelo: textura que se repite debajo de la caja
-    scene->addRect(caja.xmin, H, W, ALTO_SUELO, Qt::NoPen, QBrush(QPixmap(":/assets/suelo.png")));
+    scene->addRect(caja.xmin, H, W, ALTO_SUELO, Qt::NoPen,
+                   QBrush(QPixmap(":/assets/suelo.png")));
 
     // Borde de la caja (sin relleno, para que se vea el fondo)
     scene->addRect(caja.xmin, caja.ymin, W, H, QPen(Qt::black, 2), Qt::NoBrush);
@@ -161,14 +147,14 @@ void VentanaJuego::dibujarEscena() {
     fuente.setBold(true);
 
     QPixmap texLadrillo(":/assets/ladrillo.png");
-    for (const Bloque &b : bloques) {
+    for (const Bloque &b : juego.getBloques()) {
         QGraphicsRectItem *item = scene->addRect(0, 0, b.ancho, b.alto,
                                                  QPen(Qt::black, 1), QBrush(texLadrillo));
         item->setPos(b.x, b.y);
         itemsBloques[b.id] = item;
 
         // Capa roja encima del bloque: transparente al inicio, se oscurece con el daño
-        QGraphicsRectItem *sombra = new QGraphicsRectItem(0, 0, b.ancho, b.alto, item);  // hijo
+        QGraphicsRectItem *sombra = new QGraphicsRectItem(0, 0, b.ancho, b.alto, item);
         sombra->setPen(Qt::NoPen);
         sombra->setBrush(Qt::transparent);
         sombrasBloques[b.id] = sombra;
@@ -181,40 +167,67 @@ void VentanaJuego::dibujarEscena() {
     }
     actualizarBloques();   // pone los números iniciales (100 y 200) centrados
 
-    // Rivales: sprite de 160x180 px escalado a 40x45 unidades
+    // Rivales: el sprite se escala a la altura del Representante (80) y se centra en su ancho,
+    // así lo que se ve coincide con la zona que detecta Representante::tocadoPor
     for (int p = 0; p < 2; ++p) {
-        const Bloque &sup = bloques[p * 3];
+        const Representante &rep = juego.getRepresentante(p);
         QPixmap pix(p == 0 ? ":/assets/rival_azul.png" : ":/assets/rival_rojo.png");
+        const double escala = rep.alto / pix.height();
         QGraphicsPixmapItem *rival = scene->addPixmap(pix);
         rival->setTransformationMode(Qt::SmoothTransformation);
-        rival->setScale(40.0 / pix.width());      // 160 px -> 40 unidades
-        rival->setPos(sup.x + 50, H - 45);        // misma posición de antes
+        rival->setScale(escala);
+        rival->setPos(rep.x + (rep.ancho - pix.width() * escala) / 2.0, rep.y);
     }
 
     // Cañones: tubo (rectángulo que gira) + base circular
     for (int i = 0; i < 2; ++i) {
-        const Jugador &j = jugadores[i];
+        const Jugador &j = juego.getJugador(i);
         QColor color = (i == 0) ? QColor(60, 130, 240) : QColor(235, 70, 70);
 
-        canones[i] = scene->addRect(0, -3, 28, 6, QPen(Qt::black, 1), QBrush(color.darker(150)));
+        canones[i] = scene->addRect(0, -3, 28, 6, QPen(Qt::black, 1),
+                                    QBrush(color.darker(150)));
         canones[i]->setPos(j.getCanionX(), j.getCanionY());
-        // Qt gira en sentido horario (y hacia abajo): derecha-arriba = -45, izquierda-arriba = 180+45
+        // Qt gira en sentido horario (y hacia abajo): derecha-arriba = -45, izquierda = 180+45
         canones[i]->setRotation(j.getDireccion() > 0 ? -45.0 : 225.0);
 
         QGraphicsEllipseItem *baseCanion = scene->addEllipse(-10, -10, 20, 20,
-                                                             QPen(Qt::black, 1), QBrush(color));
+                                                             QPen(Qt::black, 1),
+                                                             QBrush(color));
         baseCanion->setPos(j.getCanionX(), j.getCanionY());
     }
 }
 
-void VentanaJuego::resizeEvent(QResizeEvent *event) {
-    QMainWindow::resizeEvent(event);
-    QTimer::singleShot(0, this, [this]() {
-        view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
-    });
+// ======================== REFRESCO DE BLOQUES ========================
+void VentanaJuego::actualizarBloques() {
+    for (const Bloque &b : juego.getBloques()) {
+        QGraphicsRectItem *item = itemsBloques[b.id];
+
+        // Destruido: se oculta, no se borra (igual que las partículas fusionadas)
+        if (b.estaDestruido()) {
+            item->setVisible(false);
+            continue;
+        }
+        item->setVisible(true);
+
+        // fraccion = 1 intacto, 0 destruido
+        const double fraccion = b.resistencia / b.resistenciaMax;
+
+        // Mientras más daño, más opaca la capa roja (alpha de 0 a 170)
+        sombrasBloques[b.id]->setBrush(
+            QColor(200, 0, 0, static_cast<int>((1.0 - fraccion) * 170)));
+
+        // Número de resistencia centrado en el bloque
+        QGraphicsSimpleTextItem *t = textosBloques[b.id];
+        t->setText(QString::number(static_cast<int>(std::ceil(b.resistencia))));
+        const QRectF br = t->boundingRect();
+        t->setPos((b.ancho - br.width()) / 2.0, (b.alto - br.height()) / 2.0);
+    }
 }
+
+// ======================== DISPARO ========================
 void VentanaJuego::disparar(double angulo, double velocidad) {
-    if (enVuelo || ganador >= 0) return;   // no se dispara en vuelo ni si ya hay ganador
+    // Juego::lanzar valida todo: que no haya proyectil en vuelo, que no haya ganador y el rango
+    if (!juego.lanzar(angulo, velocidad)) return;
 
     // Borrar las marcas de rebote del tiro anterior
     for (QGraphicsEllipseItem *m : marcasRebote) {
@@ -223,77 +236,72 @@ void VentanaJuego::disparar(double angulo, double velocidad) {
     }
     marcasRebote.clear();
 
-    const Jugador &j = jugadores[turno];
-    proyectil = Proyectil(turno, j.getCanionX(), j.getCanionY(), angulo, velocidad,
-                          j.getDireccion(), Config::MASA_PROYECTIL, Config::RADIO_PROYECTIL);
-    enVuelo = true;
-        sonidoDisparo->play();
-    tiempoVuelo = 0.0;
+    sonidoDisparo->play();
 
-    camino = QPainterPath(QPointF(proyectil.getX(), proyectil.getY()));
+    const Proyectil &p = juego.getProyectil();
+    camino = QPainterPath(QPointF(p.getX(), p.getY()));
     trayectoria->setPath(camino);
-    itemProyectil->setPos(proyectil.getX(), proyectil.getY());
+    itemProyectil->setPos(p.getX(), p.getY());
     itemProyectil->setVisible(true);
-    jugadores[turno].registrarLanzamiento(angulo, velocidad);   // Jugador recuerda su último tiro
-    actualizarPanel();                                          // bloquea los controles mientras vuela
+    actualizarPanel();                 // bloquea los controles mientras vuela
 }
 
+// ======================== BUCLE DEL JUEGO ========================
 void VentanaJuego::tic() {
-    if (!enVuelo) return;
+    if (juego.getEstado() != EstadoJuego::PROYECTIL_EN_VUELO) return;
 
-    // 1. Movimiento parabólico (ecuaciones del enunciado, en Proyectil::avanzar)
-    proyectil.avanzar(Config::DT, Config::GRAVEDAD);
-    tiempoVuelo += Config::DT;
+    const int turnoAntes = juego.getTurnoActual();
+    const Proyectil &p = juego.getProyectil();
+    const double vxAntes = p.getVx();
+    const double vyAntes = p.getVy();
 
-    // 2. COLISIÓN ELÁSTICA con las paredes de la caja (punto 3.2)
-    if (caja.rebotar(proyectil)) {
-        marcarRebote(proyectil.getX(), proyectil.getY());
+    // 1. Un paso de física (clase de Salomé): mover, rebote ELÁSTICO con la caja (3.2),
+    //    choque inelástico y daño (3.4, 3.5), victoria y fin del turno
+    juego.actualizar(Config::DT);
+
+    // 2. Marca amarilla si rebotó en una pared: la velocidad cambió de signo pegada a la caja
+    const Caja &caja = juego.getCaja();
+    const double r = p.getRadio();
+    const bool enParedX = (p.getX() - r <= caja.xmin + 0.01) || (p.getX() + r >= caja.xmax - 0.01);
+    const bool enParedY = (p.getY() - r <= caja.ymin + 0.01) || (p.getY() + r >= caja.ymax - 0.01);
+    if ((enParedX && vxAntes * p.getVx() < 0) || (enParedY && vyAntes * p.getVy() < 0)) {
+        marcarRebote(p.getX(), p.getY());
     }
-    // 2b. TEMPORAL: choque inelástico con bloques y daño.
-    //     Esto lo reemplaza la clase de Salomé; aquí solo sirve para probar el dibujo.
-    for (Bloque &b : bloques) {
-        if (b.estaDestruido()) continue;
-        double vImpacto = 0.0;
-        if (b.colisiona(proyectil, Config::COEF_RESTITUCION, vImpacto)) {
-            if (b.propietario != turno && vImpacto >= Config::VEL_MIN_IMPACTO) {
-                b.recibirDano(Config::FACTOR_DANO * proyectil.getMasa() * vImpacto);
-            }
-            actualizarBloques();   // ← ESTA es tu parte: refrescar el dibujo después del daño
-            break;
-        }
-    }
-    // 2c. TEMPORAL: victoria si el proyectil toca al Rival enemigo (esto lo decide Salomé)
-    if (tocaRival(1 - turno)) {
-        mostrarVictoria(turno);
+
+    // 3. Refrescar el dibujo: daño en bloques, proyectil y trayectoria
+    actualizarBloques();
+    itemProyectil->setPos(p.getX(), p.getY());
+    camino.lineTo(p.getX(), p.getY());
+    trayectoria->setPath(camino);
+
+    // 4. ¿Alguien ganó?
+    if (juego.getEstado() == EstadoJuego::TERMINADO) {
+        mostrarVictoria(juego.getGanador());
         return;
     }
 
-    // 3. Actualizar el dibujo con la nueva posición
-    itemProyectil->setPos(proyectil.getX(), proyectil.getY());
-    camino.lineTo(proyectil.getX(), proyectil.getY());
-    trayectoria->setPath(camino);
-
-    // 4. TEMPORAL: el tiro termina a los 8 s y cambia el turno (después lo decide Salomé)
-    if (tiempoVuelo >= Config::TIEMPO_MAX_VUELO) {
-        enVuelo = false;
+    // 5. ¿Terminó el tiro? (Juego cambia el turno)
+    if (juego.getTurnoActual() != turnoAntes) {
         itemProyectil->setVisible(false);
-        turno = 1 - turno;
 
         // El siguiente jugador arranca con su último ángulo y velocidad
-        sliderAngulo->setValue(static_cast<int>(jugadores[turno].getUltimoAngulo()));
-        sliderVelocidad->setValue(static_cast<int>(jugadores[turno].getUltimaVelocidad()));
+        const Jugador &j = juego.getJugador(juego.getTurnoActual());
+        sliderAngulo->setValue(static_cast<int>(j.getUltimoAngulo()));
+        sliderVelocidad->setValue(static_cast<int>(j.getUltimaVelocidad()));
         actualizarCanion();
         actualizarPanel();
     }
 }
 
 void VentanaJuego::marcarRebote(double x, double y) {
-    QGraphicsEllipseItem *m = scene->addEllipse(-3, -3, 6, 6, QPen(Qt::black, 0.5), QBrush(Qt::yellow));
+    QGraphicsEllipseItem *m = scene->addEllipse(-3, -3, 6, 6, QPen(Qt::black, 0.5),
+                                                QBrush(Qt::yellow));
     m->setPos(x, y);
     m->setZValue(4);
     marcasRebote.push_back(m);
 }
 
+// ======================== TECLADO Y CONTROLES ========================
 void VentanaJuego::keyPressEvent(QKeyEvent *event) {
     switch (event->key()) {
     case Qt::Key_Space: disparar(sliderAngulo->value(), sliderVelocidad->value()); break;
@@ -311,58 +319,37 @@ void VentanaJuego::actualizarCanion() {
     lblAngulo->setText(QString("Ángulo: %1°").arg(a));
     lblVelocidad->setText(QString("Velocidad: %1").arg(sliderVelocidad->value()));
 
-    if (enVuelo) return;   // mientras vuela, el cañón no se mueve
-    const int dir = jugadores[turno].getDireccion();
-    // Qt gira en sentido horario (y hacia abajo): derecha-arriba = -a, izquierda-arriba = 180 + a
+    if (juego.getEstado() != EstadoJuego::ESPERANDO_LANZAMIENTO) return;  // no gira en vuelo
+    const int turno = juego.getTurnoActual();
+    const int dir = juego.getJugador(turno).getDireccion();
+    // Qt gira en sentido horario (y hacia abajo): derecha-arriba = -a, izquierda = 180 + a
     canones[turno]->setRotation(dir > 0 ? -a : 180.0 + a);
 }
 
 void VentanaJuego::actualizarPanel() {
-    const bool puedeDisparar = !enVuelo && ganador < 0;
+    const bool puedeDisparar = juego.getEstado() == EstadoJuego::ESPERANDO_LANZAMIENTO;
     btnDisparar->setEnabled(puedeDisparar);
     sliderAngulo->setEnabled(puedeDisparar);
     sliderVelocidad->setEnabled(puedeDisparar);
 
-    const int jugador = (ganador >= 0) ? ganador : turno;
+    const int ganador = juego.getGanador();
+    const int jugador = (ganador >= 0) ? ganador : juego.getTurnoActual();
     QColor color = (jugador == 0) ? QColor(60, 130, 240) : QColor(235, 70, 70);
-    const QString nombre = QString::fromStdString(jugadores[jugador].getNombre());
+    const QString nombre = QString::fromStdString(juego.getJugador(jugador).getNombre());
 
     lblTurno->setText(ganador >= 0 ? QString("Ganó %1").arg(nombre)
                                    : QString("Turno: %1").arg(nombre));
-    lblTurno->setStyleSheet(QString("color: %1; font-weight: bold; font-size: 16px;").arg(color.name()));
+    lblTurno->setStyleSheet(QString("color: %1; font-weight: bold; font-size: 16px;")
+                                .arg(color.name()));
 }
 
-void VentanaJuego::actualizarBloques() {
-    for (const Bloque &b : bloques) {
-        QGraphicsRectItem *item = itemsBloques[b.id];
-
-        // Destruido: se oculta, no se borra (igual que las partículas fusionadas en la Parte 1)
-        if (b.estaDestruido()) {
-            item->setVisible(false);
-            continue;
-        }
-        item->setVisible(true);
-
-        // fraccion = 1 intacto, 0 destruido
-        const double fraccion = b.resistencia / b.resistenciaMax;
-
-        // Mientras más daño, más opaca la capa roja (alpha de 0 a 170)
-        sombrasBloques[b.id]->setBrush(QColor(200, 0, 0, static_cast<int>((1.0 - fraccion) * 170)));
-
-        // Número de resistencia centrado en el bloque
-        QGraphicsSimpleTextItem *t = textosBloques[b.id];
-        t->setText(QString::number(static_cast<int>(std::ceil(b.resistencia))));
-        const QRectF br = t->boundingRect();
-        t->setPos((b.ancho - br.width()) / 2.0, (b.alto - br.height()) / 2.0);
-    }
-}
+// ======================== VICTORIA Y REINICIO ========================
 void VentanaJuego::mostrarVictoria(int jugador) {
-    ganador = jugador;
-    enVuelo = false;
     itemProyectil->setVisible(false);
 
     QColor color = (jugador == 0) ? QColor(90, 160, 255) : QColor(255, 100, 100);
-    textoVictoria->setText(QString("¡Gana %1!").arg(QString::fromStdString(jugadores[jugador].getNombre())));
+    textoVictoria->setText(QString("¡Gana %1!")
+                               .arg(QString::fromStdString(juego.getJugador(jugador).getNombre())));
     textoVictoria->setBrush(color);
     textoVictoria->setPen(QPen(Qt::black, 1));
 
@@ -376,14 +363,7 @@ void VentanaJuego::mostrarVictoria(int jugador) {
 }
 
 void VentanaJuego::reiniciarPartida() {
-    // TEMPORAL: cuando esté la clase de Salomé, aquí se llama a su reiniciar()
-    bloques.clear();
-    jugadores.clear();
-    crearEscenario();                // vuelve a crear bloques con resistencia completa
-
-    ganador = -1;
-    turno = 0;
-    enVuelo = false;
+    juego.reiniciar();               // bloques con resistencia completa, turno 0, sin ganador
 
     bannerVictoria->setVisible(false);
     itemProyectil->setVisible(false);
@@ -404,16 +384,10 @@ void VentanaJuego::reiniciarPartida() {
     actualizarPanel();
 }
 
-// TEMPORAL: misma detección que Bloque::colisiona (punto del rectángulo más cercano al centro)
-bool VentanaJuego::tocaRival(int jugadorRival) const {
-    const Bloque &sup = bloques[jugadorRival * 3];        // bloque superior de esa fortaleza
-    const double rx = sup.x + 50, ry = caja.ymax - 45;    // misma posición con la que se dibujó
-    const double rw = 40, rh = 45;
-
-    const double cx = std::max(rx, std::min(proyectil.getX(), rx + rw));
-    const double cy = std::max(ry, std::min(proyectil.getY(), ry + rh));
-    const double dx = proyectil.getX() - cx;
-    const double dy = proyectil.getY() - cy;
-    const double r = proyectil.getRadio();
-    return dx * dx + dy * dy < r * r;
+// ======================== ESCALADO ========================
+void VentanaJuego::resizeEvent(QResizeEvent *event) {
+    QMainWindow::resizeEvent(event);
+    QTimer::singleShot(0, this, [this]() {
+        view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    });
 }
