@@ -24,8 +24,10 @@ qt_add_executable(practica_5 MACOSX_BUNDLE
     bloque.h bloque.cpp
     proyectil.h proyectil.cpp
     ventanajuego.h ventanajuego.cpp
+    representante.h representante.cpp
+    juego.h juego.cpp
 )
-# Imágenes empaquetadas dentro del ejecutable (se usan con la ruta ":/assets/...")
+# Imágenes y sonidos empaquetados dentro del ejecutable (rutas ":/assets/...")
 qt_add_resources(practica_5 "recursos"
     PREFIX "/"
     FILES
