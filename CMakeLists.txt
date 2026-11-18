@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 project(practica_5 LANGUAGES CXX)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets Multimedia)
 
 qt_standard_project_setup()
 
@@ -25,11 +25,23 @@ qt_add_executable(practica_5 MACOSX_BUNDLE
     proyectil.h proyectil.cpp
     ventanajuego.h ventanajuego.cpp
 )
-
+# Imágenes empaquetadas dentro del ejecutable (se usan con la ruta ":/assets/...")
+qt_add_resources(practica_5 "recursos"
+    PREFIX "/"
+    FILES
+        assets/fondo.png
+        assets/ladrillo.png
+        assets/suelo.png
+        assets/rival_azul.png
+        assets/rival_rojo.png
+        assets/disparo.wav
+        assets/ambiente.mp3
+)
 target_link_libraries(practica_5
     PRIVATE
         Qt::Core
         Qt::Widgets
+        Qt::Multimedia
 )
 
 install(TARGETS practica_5

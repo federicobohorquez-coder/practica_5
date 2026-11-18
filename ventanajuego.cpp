@@ -9,6 +9,8 @@
 #include <QPainterPath>
 #include <cmath>
 #include <algorithm>
+#include <QGraphicsPixmapItem>
+#include <QPixmap>
 
 VentanaJuego::VentanaJuego(QWidget *parent) : QMainWindow(parent) {
     scene = new QGraphicsScene(this);
@@ -101,6 +103,18 @@ VentanaJuego::VentanaJuego(QWidget *parent) : QMainWindow(parent) {
     QTimer::singleShot(0, this, [this]() {
         view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
     });
+    // ---------- Sonido ----------
+    sonidoDisparo = new QSoundEffect(this);
+    sonidoDisparo->setSource(QUrl("qrc:/assets/disparo.wav"));
+    sonidoDisparo->setVolume(0.6f);
+
+    salidaAudio = new QAudioOutput(this);
+    salidaAudio->setVolume(0.3f);               // bajito, para que no tape el disparo
+    musicaAmbiente = new QMediaPlayer(this);
+    musicaAmbiente->setAudioOutput(salidaAudio);
+    musicaAmbiente->setSource(QUrl("qrc:/assets/ambiente.mp3"));
+    musicaAmbiente->setLoops(QMediaPlayer::Infinite);   // se repite sin parar
+    musicaAmbiente->play();
 }
 void VentanaJuego::crearEscenario() {
     const double W = Config::ANCHO_CAJA;   // 800
@@ -126,18 +140,30 @@ void VentanaJuego::crearEscenario() {
 void VentanaJuego::dibujarEscena() {
     const double W = caja.xmax - caja.xmin;
     const double H = caja.ymax - caja.ymin;
-    scene->setSceneRect(caja.xmin, caja.ymin, W, H);
+    const double ALTO_SUELO = 30.0;
+    scene->setSceneRect(caja.xmin, caja.ymin, W, H + ALTO_SUELO);   // incluye la franja de suelo
 
-    // Fondo y borde de la caja
-    scene->addRect(caja.xmin, caja.ymin, W, H, QPen(Qt::black, 2), QBrush(QColor(170, 210, 240)));
+    // Fondo: imagen de 1600x800 px escalada a 800x400 unidades
+    QPixmap fondo(":/assets/fondo.png");
+    QGraphicsPixmapItem *itemFondo = scene->addPixmap(fondo);
+    itemFondo->setTransformationMode(Qt::SmoothTransformation);
+    itemFondo->setScale(W / fondo.width());
+    itemFondo->setZValue(-10);                                     // detrás de todo
+
+    // Suelo: textura que se repite debajo de la caja
+    scene->addRect(caja.xmin, H, W, ALTO_SUELO, Qt::NoPen, QBrush(QPixmap(":/assets/suelo.png")));
+
+    // Borde de la caja (sin relleno, para que se vea el fondo)
+    scene->addRect(caja.xmin, caja.ymin, W, H, QPen(Qt::black, 2), Qt::NoBrush);
 
     QFont fuente;
     fuente.setPixelSize(9);
     fuente.setBold(true);
 
+    QPixmap texLadrillo(":/assets/ladrillo.png");
     for (const Bloque &b : bloques) {
         QGraphicsRectItem *item = scene->addRect(0, 0, b.ancho, b.alto,
-                                                 QPen(Qt::black, 1), QBrush(QColor(180, 100, 60)));
+                                                 QPen(Qt::black, 1), QBrush(texLadrillo));
         item->setPos(b.x, b.y);
         itemsBloques[b.id] = item;
 
@@ -155,16 +181,14 @@ void VentanaJuego::dibujarEscena() {
     }
     actualizarBloques();   // pone los números iniciales (100 y 200) centrados
 
-    // Rivales (solo dibujo por ahora; su lógica la define Salomé)
+    // Rivales: sprite de 160x180 px escalado a 40x45 unidades
     for (int p = 0; p < 2; ++p) {
-        const Bloque &sup = bloques[p * 3];   // bloque superior de esa fortaleza
-        QColor color = (p == 0) ? QColor(60, 130, 240) : QColor(235, 70, 70);
-        QGraphicsRectItem *rival = scene->addRect(0, 0, 40, 45, QPen(Qt::black, 1), QBrush(color));
-        rival->setPos(sup.x + 50, H - 45);
-        QGraphicsSimpleTextItem *t = new QGraphicsSimpleTextItem("Rival", rival);
-        t->setFont(fuente);
-        t->setBrush(Qt::white);
-        t->setPos((40 - t->boundingRect().width()) / 2.0, 15);
+        const Bloque &sup = bloques[p * 3];
+        QPixmap pix(p == 0 ? ":/assets/rival_azul.png" : ":/assets/rival_rojo.png");
+        QGraphicsPixmapItem *rival = scene->addPixmap(pix);
+        rival->setTransformationMode(Qt::SmoothTransformation);
+        rival->setScale(40.0 / pix.width());      // 160 px -> 40 unidades
+        rival->setPos(sup.x + 50, H - 45);        // misma posición de antes
     }
 
     // Cañones: tubo (rectángulo que gira) + base circular
@@ -203,6 +227,7 @@ void VentanaJuego::disparar(double angulo, double velocidad) {
     proyectil = Proyectil(turno, j.getCanionX(), j.getCanionY(), angulo, velocidad,
                           j.getDireccion(), Config::MASA_PROYECTIL, Config::RADIO_PROYECTIL);
     enVuelo = true;
+        sonidoDisparo->play();
     tiempoVuelo = 0.0;
 
     camino = QPainterPath(QPointF(proyectil.getX(), proyectil.getY()));
