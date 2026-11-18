@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include "Caja.h"
-#include "Obstaculo.h"
+#include "obstaculo.h"
 
 struct PosicionParticula {
     int id;

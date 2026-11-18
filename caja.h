@@ -7,6 +7,7 @@ class Caja {
 public:
     double xmin, xmax, ymin, ymax;
 
+    // Constructor con valores por defecto
     Caja(double xmin = 0, double xmax = 100, double ymin = 0, double ymax = 60)
         : xmin(xmin), xmax(xmax), ymin(ymin), ymax(ymax) {}
 

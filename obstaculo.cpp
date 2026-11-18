@@ -8,13 +8,13 @@ bool obstaculo::colisiona(Particula& p, double e) const {
     const double py = p.getY();
 
     // 1. DETECCION: punto del cuadrado mas cercano al centro de la particula
-    const double cx = std::max(x, std::min(px, x + lado));
-    const double cy = std::max(y, std::min(py, y + lado));
+    const double cx = std::max(x, std::min(px, x + lado));  //Recorta  la coordenada del centro al intervalo del cuadrado
+    const double cy = std::max(y, std::min(py, y + lado)); // Dsitacion - No choque
     const double dx = px - cx;
     const double dy = py - cy;
     if (dx * dx + dy * dy >= r * r) return false;   // no se tocan
 
-    // 2. LADO GOLPEADO: normal n (unitaria, apunta hacia afuera del cuadrado)
+    // 2. LADO GOLPEADO: Se mira el vector que va de ese punto al centro de la partícula. Componenete mayor - Valor Absoluto / Menor normal n
     double nx = 0.0, ny = 0.0;
     if (dx != 0.0 || dy != 0.0) {
         if (std::fabs(dx) > std::fabs(dy)) nx = (dx > 0) ? 1.0 : -1.0;  // lado de mayor/menor x

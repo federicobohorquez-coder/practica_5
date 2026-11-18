@@ -11,7 +11,7 @@ public:
     obstaculo(int id, double x, double y, double lado)
         : id(id), x(x), y(y), lado(lado) {}
 
-    // Devuelve true si hubo colision (la Simulacion la registra como OBST).
+    // Devuelve true si hubo colision . Declaración. Recibe la partícula
     bool colisiona(Particula& p, double e) const;
 };
 
